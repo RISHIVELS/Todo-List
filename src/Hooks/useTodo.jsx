@@ -1,4 +1,4 @@
-import { createContext, useReducer } from "react";
+import { createContext, useEffect, useReducer } from "react";
 import React from "react";
 /*
 
@@ -34,7 +34,16 @@ function todoReducer(state, action) {
 export const TodoContext = createContext();
 
 export function TodoProvider({ children }) {
-  const [state, dispatch] = useReducer(todoReducer, []);
+  const loadFromLocalStorage = () => {
+    const storedTodos = localStorage.getItem("todos");
+    return storedTodos ? JSON.parse(storedTodos) : [];
+  };
+
+  const [state, dispatch] = useReducer(todoReducer, [], loadFromLocalStorage);
+
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(state));
+  }, [state]);
 
   function addList(name) {
     dispatch({
